@@ -9,16 +9,12 @@
                 <group string="Entrance Exam">
                     <field name="is_test" string="Is an Entrance Exam?"/>  
                     <div class="o_checkbox_optional_test" attrs="{'invisible': [('is_test', '=', False)]}">
-                        <label for="min_score" string="Min score (%)"/>
+                        <label for="min_score" string="Min score"/>
                         <field name='min_score'/>
-                        <label for="max_score" string="Max score (%)"/>
+                        <label for="max_score" string="Max score"/>
                         <field name='max_score'/>
                     </div>
                 </group>
-            </xpath>
-
-            <xpath expr="//page[@name='questions']//field[@name='title']" position="attributes">
-                <attribute name="widget">html</attribute>
             </xpath>
         </field>
     </record>

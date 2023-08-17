@@ -54,13 +54,19 @@ odoo.define("survey_config.form", function (require) {
               true
             );
             break;
+          case "simple_choice_dropdown":
+            params = self._prepareSubmitSelectChoices(params,
+              $(this),
+              $(this).data("name"))
           case "simple_choice_radio":
           case "multiple_choice":
+
             params = self._prepareSubmitChoices(
               params,
               $(this),
               $(this).data("name")
             );
+            console.log(params)
             break;
           case "matrix":
             params = self._prepareSubmitAnswersMatrix(params, $(this));
@@ -68,5 +74,17 @@ odoo.define("survey_config.form", function (require) {
         }
       });
     },
+
+    _prepareSubmitSelectChoices: function (params, $parent, questionId) {
+      var self = this;
+      $parent.find('select').each(function () {
+          if (this.value !== '0') {
+              params = self._prepareSubmitAnswer(params, questionId, this.value);
+          }
+      });
+      params = self._prepareSubmitComment(params, $parent, questionId, false);
+     
+      return params;
+  },
   });
 });

@@ -9,7 +9,7 @@
             <field name="arch" type="xml">
                 <!-- Add the 'question_already' field to the existing view -->
                 <xpath expr="//field[@name='questions_selection']" position="before">   
-                    <label for="title" string="Available Question" attrs="{'invisible': [('is_page', '=', True)]}"/>
+                    <label for="title" string="Question Already" attrs="{'invisible': [('is_page', '=', True)]}"/>
                     <field name="question_already" />
                 </xpath>
             </field>

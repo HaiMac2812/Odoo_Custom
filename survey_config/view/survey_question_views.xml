@@ -12,12 +12,45 @@
           <i class="fa fa-2x" role="img" aria-label="Numeric" title="Numeric">did</i>
         </div>
       </xpath>
+      <xpath expr="//div[@class='mx-lg-auto w-lg-50 d-none d-sm-block o_preview_questions']"
+        position='inside'>
+        <div attrs="{'invisible': [('question_type', '!=', 'drop_down')]}">
+          <span>What ___ you do last night?</span>
+          <div class="o_preview_questions_choice mb-2"><i class="fa fa-circle-o  fa-lg me-2"/>answer</div>
+          <div class="o_preview_questions_choice mb-2"><i class="fa fa-dot-circle-o fa-lg me-2"/>answer</div>
+          <div class="o_preview_questions_choice"><i class="fa fa-circle-o  fa-lg me-2"/>answer</div>
+        </div>
+        <div 
+          attrs="{'invisible': [('question_type', '!=', 'title')]}" 
+          role="img" aria-label="Multiple choice with one answer" 
+          title="Multiple choice with one answer"> 
+          <div class="row "> 
+              <div 
+                  class="col-6 bg-info d-flex justify-center align-items-center"> 
+                  <p>Title here</p> 
+              </div> 
+              <br /> 
+              <div 
+                  class="col-6 bg-primary d-flex justify-center align-items-center"> 
+                  <p>Question here</p> 
+              </div> 
+          </div> 
+      </div>
+      </xpath>
+      
+        
 
       <xpath expr="//notebook/page[@name='answers']"
         position='attributes'>
         <group
           attrs="{'invisible': ['|', '|',('is_page', '=', True), ('question_type', '=', 'text_box'),'&amp;', ('scoring_type', '=', 'no_scoring'), ('question_type', 'in', ['numerical_box', 'date', 'datetime', 'text_input_with_answer']),]}" />
       </xpath>
+      <xpath expr="//notebook"
+        position='attributes'>
+        <attribute name="attrs">
+          {'invisible': [('question_type', '=', 'title')]}</attribute>
+      </xpath>
+
 
       <xpath expr="//notebook/page[@name='answers']/group"
         position='before'>
@@ -41,6 +74,35 @@
           </div>
         </group>
       </xpath>
+
+      <xpath expr="//notebook/page[@name='answers']/group"
+        position='before'>
+        <group attrs="{'invisible': [('question_type', 'not in', ['drop_down'])]}">    
+          <field name="suggested_answer_ids" context="{'default_question_id': active_id}" nolabel="1" colspan="2">
+            <tree editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="value" string="Choices"/>
+                <field name="is_correct"
+                    attrs="{'column_invisible': ['|', ('parent.scoring_type', '=', 'no_scoring'), ('parent.question_type', '=', 'matrix')]}"/>
+                <field name="answer_score"
+                    attrs="{'column_invisible': ['|', ('parent.scoring_type', '=', 'no_scoring'), ('parent.question_type', '=', 'matrix')]}"/>
+                <field name="value_image_filename" invisible="1"/>
+                <field name="value_image" width="200px" filename="value_image_filename" options="{'accepted_file_extensions': 'image/*'}"
+                    attrs="{'column_invisible': [('parent.question_type', '=', 'matrix')]}"/>
+            </tree>
+          </field>
+        </group>
+      </xpath>
+
+      <xpath expr="//notebook/page[@name='options']/group/group"
+        position = 'inside'>
+        <field name='comments_allowed' attrs="{'invisible':[('question_type','not in',['drop_down','multiple_choice', 'matrix'])]}"/>
+        <field name='comments_message'
+            attrs="{'invisible': ['|', ('question_type', 'not in', ['drop_down','multiple_choice', 'matrix']), ('comments_allowed', '=', False)]}"
+            placeholder="If other, please specify:"/>
+        <field name='comment_count_as_answer'
+            attrs="{'invisible': ['|', ('question_type', 'not in', ['drop_down','multiple_choice', 'matrix']), ('comments_allowed', '=', False)]}"/>
+      </xpath>
     </field>
   </record>
 
@@ -60,7 +122,11 @@
       <t t-if="question.question_type == 'only_text'">
         <t t-call="survey_config.question_only_text" />
       </t>
+      <t t-if="question.question_type == 'drop_down'">
+        <t t-call="survey_config.question_drop_down"/>
+      </t>
     </xpath>
+
     <xpath expr="//div[position()=last()]/div[1]" position="replace">
       <div class="">
         <h4 t-if="not hide_question_title" class='text-primary'>
@@ -73,6 +139,64 @@
       </div>
     </xpath>
   </template>
+
+
+  <template id="question_drop_down" name="Question: Drop down">
+        <t t-set="answer_line" t-value="answer_lines.filtered(lambda line: line.suggested_answer_id)"/>
+        <t t-set="comment_line" t-value="answer_lines.filtered(lambda line: line.value_char_box)"/>
+        <div class="row o_survey_form_choice"
+            t-att-data-name="question.id"
+            data-question-type="simple_choice_dropdown">
+            <t t-set="selected_answer_id" t-value="0"/>
+            <div t-attf-class="col-lg-12">
+                <select t-att-id="str(question.id)" t-att-name="question.id" class="form-select"
+                        t-attf-onchange="selected_answer_id = parseInt(jQuery(this).val())">
+                    <option value="0">Choose an option</option>
+                    <t t-foreach="question.suggested_answer_ids" t-as="label">
+                        <option t-att-value="label.id">
+                            <t t-esc="label.value"/>
+                        </option>
+                    </t>
+                </select>
+                <div t-attf-class="o_survey_choice_btn mt-2 py-1 px-3 rounded bg-success" t-if="selected_answer_id">
+                    <t t-foreach="question.suggested_answer_ids" t-as="label">
+                        <div t-if="label.id == selected_answer_id" class="text-break">
+                            <t t-esc="label.value"/>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        
+
+            <div t-if='question.comments_allowed and question.comment_count_as_answer' class="js_comments col-lg-12" >
+                <div class="d-flex flex-wrap">
+                    <label t-att-class="'o_survey_choice_btn form-label me-2 py-1 px-3 rounded %s' % ('o_survey_selected' if comment_line else '')">
+                        <t t-set="item_idx" t-value="item_idx + 1"/>
+                        <t t-call="survey.survey_selection_key">
+                            <t t-set="selection_key_class" t-value="'position-relative o_survey_radio_btn float-start d-flex'"/>
+                        </t>
+                        <input type="radio" class="o_survey_form_choice_item o_survey_js_form_other_comment invisible position-absolute" value="-1"
+                                t-att-name='question.id'
+                                t-att-checked="comment_line and 'checked' or None"
+                                t-att-data-selection-key="letters[item_idx] if useKeySelection else ''"/>
+                        <span class="ms-2" t-out="question.comments_message or default_comments_message" />
+                        <i class="fa fa-check-circle float-end mt-1 position-relative"></i>
+                        <i class="fa fa-circle-thin float-end mt-1 position-relative"></i>
+                    </label>
+                </div>
+                <div t-attf-class="o_survey_comment_container mt-3 py-0 px-1  #{'d-none' if not comment_line else ''}">
+                    <textarea type="text" class="form-control o_survey_question_text_box bg-transparent text-dark rounded-0 p-0"
+                              t-att-disabled="None if comment_line else 'disabled'"><t t-esc="comment_line.value_char_box if comment_line else ''"/></textarea>
+                </div>
+            </div>
+            <div t-if='question.comments_allowed and not question.comment_count_as_answer' class="col-lg-12 o_survey_comment_container mx-1 mt-3 ps-3 pe-4">
+                <textarea type="text" class="form-control o_survey_comment o_survey_question_text_box bg-transparent text-dark rounded-0 p-0"
+                          t-att-placeholder="question.comments_message or default_comments_message if not survey_form_readonly else ''"><t t-esc="comment_line.value_char_box if comment_line else ''"/></textarea>
+            </div>
+        </div>
+  </template>
+
+
 
 
   <!-- <record id="survey_user_input_line_view_form_1" model="ir.ui.view">
