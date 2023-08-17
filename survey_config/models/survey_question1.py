@@ -24,7 +24,7 @@ class SurveyQuestion(models.Model):
 
     question_type = fields.Selection(
         selection_add=[("only_text", "Input answer and get score."),
-                       ("drop_down", "Drop Down"),
+                       ("drop_down", "Multiple choice: only one answer (render as a Dropdown)"),
                        ("title", "Title")]
     )
 
