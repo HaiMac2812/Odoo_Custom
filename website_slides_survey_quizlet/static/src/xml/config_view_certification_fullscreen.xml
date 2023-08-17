@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-extend="website.slides.fullscreen.certification">
+        <t t-jquery=".justify-content-center.align-self-center.text-center" t-operation="replace">
+            <div class="justify-content-center align-self-center text-center">
+                <div t-if="widget.get('slide').category === 'certification' &amp;&amp; !widget.get('slide').completed" class="">
+                    <a class="btn btn-primary" t-att-href="'/slides_survey/slide/get_certification_url?slide_id=' + widget.get('slide').id" target="_blank">
+                        <i class="fa fa-graduation-cap"/>
+                        <span t-if="widget.get('slide').isMember"> Begin Certification</span>
+                        <span t-else="">Test Certification</span>
+                    </a>
+                </div>
+                <div t-if="widget.get('slide').category === 'certification' &amp;&amp; widget.get('slide').completed">
+                    <h4 class="mb-3 text-white">Congratulations, you passed the Certification!</h4>
+                </div>
+            </div>
+        </t>
+    </t>
+</templates>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

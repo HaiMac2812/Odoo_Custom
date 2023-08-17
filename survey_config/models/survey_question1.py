@@ -15,7 +15,7 @@ class SurveyQuestion(models.Model):
     _inherit = "survey.question"
 
     # question generic data
-    title = fields.Html('Title', required=True, translate=True)
+    title =fields.Html('Title', required=True, translate=True)
     question_already = fields.Many2one(
         "survey.question", string="Question Already", ondelete="set null"
     )
@@ -23,121 +23,12 @@ class SurveyQuestion(models.Model):
     in_question_bank = fields.Boolean(string="Question is added to question bank.")
 
     question_type = fields.Selection(
-        selection_add=[("only_text", "Input answer and get score."),
-                       ("drop_down", "Multiple choice: only one answer (render as a Dropdown)"),
-                       ("title", "Title")]
+        selection_add=[("only_text", "Input answer and get score.")]
     )
 
     answer_only_text = fields.Char(
         "Correct text box answer", help="Correct text box answer for this question."
     )
-    
-    triggering_question_id = fields.Many2one(
-    'survey.question', string="Triggering Question", copy=False, compute="_compute_triggering_question_id",
-    store=True, readonly=False, help="Question containing the triggering answer to display the current question.",
-    domain="[('survey_id', '=', survey_id), \
-                '&', ('question_type', 'in', ['simple_choice', 'multiple_choice', 'drop_down']), \
-                '|', \
-                    ('sequence', '<', sequence), \
-                    '&', ('sequence', '=', sequence), ('id', '<', id)]")
-    
-    
-    
-    def validate_question(self, answer, comment=None):
-        """ Validate question, depending on question type and parameters
-         for simple choice, text, date and number, answer is simply the answer of the question.
-         For other multiple choices questions, answer is a list of answers (the selected choices
-         or a list of selected answers per question -for matrix type-):
-            - Simple answer : answer = 'example' or 2 or question_answer_id or 2019/10/10
-            - Multiple choice : answer = [question_answer_id1, question_answer_id2, question_answer_id3]
-            - Matrix: answer = { 'rowId1' : [colId1, colId2,...], 'rowId2' : [colId1, colId3, ...] }
-
-         return dict {question.id (int): error (str)} -> empty dict if no validation error.
-         """
-        self.ensure_one()
-        if isinstance(answer, str):
-            answer = answer.strip()
-        # Empty answer to mandatory question
-        if self.constr_mandatory and not answer and self.question_type not in ['simple_choice', 'multiple_choice','drop_down']:
-            return {self.id: self.constr_error_msg or _('This question requires an answer.')}
-
-        # because in choices question types, comment can count as answer
-        if answer or self.question_type in ['simple_choice', 'multiple_choice','drop_down']:
-            if self.question_type == 'char_box':
-                return self._validate_char_box(answer)
-            elif self.question_type == 'numerical_box':
-                return self._validate_numerical_box(answer)
-            elif self.question_type in ['date', 'datetime']:
-                return self._validate_date(answer)
-            elif self.question_type in ['simple_choice', 'multiple_choice','drop_down']:
-                return self._validate_choice(answer, comment)
-            elif self.question_type == 'matrix':
-                return self._validate_matrix(answer)
-        return {}
-    def _prepare_statistics(self, user_input_lines):
-        """ Compute statistical data for questions by counting number of vote per choice on basis of filter """
-        all_questions_data = []
-        for question in self:
-            question_data = {'question': question, 'is_page': question.is_page}
-
-            if question.is_page:
-                all_questions_data.append(question_data)
-                continue
-
-            # fetch answer lines, separate comments from real answers
-            all_lines = user_input_lines.filtered(lambda line: line.question_id == question)
-            if question.question_type in ['simple_choice', 'multiple_choice', 'matrix','drop_down']:
-                answer_lines = all_lines.filtered(
-                    lambda line: line.answer_type == 'suggestion' or (
-                        line.skipped and not line.answer_type) or (
-                        line.answer_type == 'char_box' and question.comment_count_as_answer)
-                    )
-                comment_line_ids = all_lines.filtered(lambda line: line.answer_type == 'char_box')
-            else:
-                answer_lines = all_lines
-                comment_line_ids = self.env['survey.user_input.line']
-            skipped_lines = answer_lines.filtered(lambda line: line.skipped)
-            done_lines = answer_lines - skipped_lines
-            question_data.update(
-                answer_line_ids=answer_lines,
-                answer_line_done_ids=done_lines,
-                answer_input_done_ids=done_lines.mapped('user_input_id'),
-                answer_input_skipped_ids=skipped_lines.mapped('user_input_id'),
-                comment_line_ids=comment_line_ids)
-            question_data.update(question._get_stats_summary_data(answer_lines))
-
-            # prepare table and graph data
-            table_data, graph_data = question._get_stats_data(answer_lines)
-            question_data['table_data'] = table_data
-            question_data['graph_data'] = json.dumps(graph_data)
-
-            all_questions_data.append(question_data)
-        return all_questions_data
-    
-    
-    def _get_stats_data(self, user_input_lines):
-        if self.question_type == 'simple_choice':
-            return self._get_stats_data_answers(user_input_lines)
-        elif self.question_type == 'drop_down':
-            return self._get_stats_data_answers(user_input_lines)
-        elif self.question_type == 'multiple_choice':
-            table_data, graph_data = self._get_stats_data_answers(user_input_lines)
-            return table_data, [{'key': self.title, 'values': graph_data}]
-        elif self.question_type == 'matrix':
-            return self._get_stats_graph_data_matrix(user_input_lines)
-        return [line for line in user_input_lines], []
-    def _get_stats_summary_data(self, user_input_lines):
-        stats = {}
-        if self.question_type in ['simple_choice', 'multiple_choice','drop_down']:
-            stats.update(self._get_stats_summary_data_choice(user_input_lines))
-        elif self.question_type == 'numerical_box':
-            stats.update(self._get_stats_summary_data_numerical(user_input_lines))
-
-        if self.question_type in ['numerical_box', 'date', 'datetime']:
-            stats.update(self._get_stats_summary_data_scored(user_input_lines))
-        return stats
-
-
 
     @api.depends(
         "question_type",
@@ -175,7 +66,6 @@ class SurveyQuestion(models.Model):
                 "simple_choice",
                 "multiple_choice",
                 "only_text",
-                "drop_dowwn"
             ]:  # config
                 question.is_scored_question = True
             else:
@@ -235,21 +125,12 @@ class SurveyQuestion(models.Model):
         if self.question_already and self.question_already.time_limit:
             self.time_limit = self.question_already.time_limit
         
-
-
+            
             
 
     # ------------------------------------------------------------
     # STATISTICS / REPORTING
     # ------------------------------------------------------------
-    @api.depends('question_type')
-    def _compute_question_placeholder(self):
-        for question in self:
-            if question.question_type in ('simple_choice', 'multiple_choice', 'matrix','drop_down') \
-                    or not question.question_placeholder:  # avoid CacheMiss errors
-                question.question_placeholder = False
-    
-
 
     def _prepare_statistics(self, user_input_lines):
         """Compute statistical data for questions by counting number of vote per choice on basis of filter"""
@@ -449,10 +330,3 @@ class SurveyQuestion(models.Model):
                 )
             ),
         }
-
-    
-
-    
-
-        
-        

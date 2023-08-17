@@ -1,0 +1,106 @@
+.btn-fill-primary, .btn-primary {
+    background-color:  #005e12 !important;
+    color:  #ffffff!important;
+    border-color: #015611 !important;
+}
+
+.o_statusbar_status{
+    background-color: #ffffff !important;
+    color: #005e12 !important;
+    border-color: #f6f6f6 !important;
+}
+
+.o_required_modifier {
+    --o-input-border-color: #005e12 !important;
+    --o-caret-color: #005e12 !important;
+}
+
+.btn-secondary {
+    color: #005e12 !important;
+    background-color: #FFFFFF !important;
+    border-color: #FFFFFF !important;
+}
+
+.breadcrumb-item.active {
+    color: #005e12 !important ;
+}
+
+.btn-fill-info, .btn-info {
+    color: #FFFFFF !important;
+    background-color: #005e12 !important;
+    border-color: #015510 !important;
+}
+
+.btn-outline-primary {
+    color: #005e12 !important;
+    border-color: #005e12 !important;
+}
+
+.btn-outline-primary:hover {
+    color: #005e12 !important;
+    border-color: #fff3adcd !important;
+    background-color:  #fede1f !important;
+}
+
+.o_searchview_facet .o_searchview_facet_label {
+    background: var(--SearchBar-facet-background, #005e12) !important;
+    color: var(--SearchBar-facet-color, #FFFFFF) !important;
+}
+
+.text-primary {
+    color: #005e12 !important;
+}
+
+.btn-link {
+    color: #005e12 !important;
+
+}
+
+.form-check-input:checked {
+    background-color: #005e12 !important;
+    border-color: #015611 !important;
+}
+
+.o_field_statusbar > .o_statusbar_status > .o_arrow_button.o_arrow_button_current.disabled {
+    background-color: #005e12 !important;
+    color: #FFFFFF;
+}
+
+a {
+    color: #005e12 !important;
+}
+
+.o_edit_website_container:not(.o_translatable) {
+    color: #FFFFFF;
+    background-color: #005e12 !important;
+    border-color: #005e12 !important;
+}
+
+.o_main_navbar .o_menu_systray > * > a, .o_main_navbar .o_menu_systray > * > .dropdown > a, .o_main_navbar .o_menu_systray > * > button, .o_main_navbar .o_menu_systray > * > label, .o_main_navbar .o_menu_brand, .o_main_navbar .o_navbar_apps_menu .dropdown-toggle, .o_main_navbar .dropdown-toggle, .o_main_navbar .o_nav_entry {
+    color: #FFFFFF  !important;
+}
+
+.o_field_statusbar > .o_statusbar_status > .o_arrow_button.o_arrow_button_current.disabled:after, .o_field_statusbar > .o_statusbar_status > .o_arrow_button.o_arrow_button_current.disabled:before {
+    border-left-color: #005e12 !important; 
+}
+
+.text-odoo {
+    color: #005e12 !important;
+}
+
+.btn-odoo {
+    color: #FFFFFF;
+    background-color: #005e12 !important;
+    border-color: #015610 !important;
+}
+
+.element.style {
+    background-color: #fede1f !important;
+    border-color: #e6c71b !important;
+   
+}
+
+.o_loading_indicator {
+    background-color: #fede1f !important;
+    color: #005e12 !important;
+}
