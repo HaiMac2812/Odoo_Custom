@@ -1,0 +1,9 @@
+.scroll_page {
+  height: 100vh;
+  overflow-y: scroll;
+  z-index: 1;
+  @media screen and (max-width: 768px) {
+    overflow: auto !important;
+    height: auto;
+  }
+}

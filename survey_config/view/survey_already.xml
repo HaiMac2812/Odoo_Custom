@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Inherit the existing view -->
+        <record id="survey_survey_view_config" model="ir.ui.view">
+            <field name="name">Config Suwrrvey Question</field>
+            <field name="model">survey.question</field>
+            <field name="inherit_id" ref="survey.survey_question_form" />
+            <field name="arch" type="xml">
+                <!-- Add the 'question_already' field to the existing view -->
+                <xpath expr="//field[@name='questions_selection']" position="before">   
+                    <label for="title" string="Question Already" attrs="{'invisible': [('is_page', '=', True)]}"/>
+                    <field name="question_already" />
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

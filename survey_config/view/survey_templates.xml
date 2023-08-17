@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="survey_fill_form_done_inherit" inherit_id="survey.survey_fill_form_done">
+        <xpath expr="//div[@class='o_survey_finished mt32 mb32']//h1" position="replace">
+            <t t-if="survey.is_test">
+                <h1> Hello
+                </h1>
+                <p>
+                    <t t-esc="survey.max_score" />
+                </p>
+            </t>
+
+        </xpath>
+    </template>
+    <template id="survey_fill_form_in_progress_inherit" inherit_id="survey.survey_fill_form_in_progress">
+        <xpath expr="//t[2]" position="replace">
+            <t t-if="survey.questions_layout == 'page_per_section'">
+                <h2 t-field='page.title' class="o_survey_title pb16 text-break" />
+                <div t-field='page.description' class="oe_no_empty text-break" />
+
+                <input type="hidden" name="page_id" t-att-value="page.id" />
+
+                <!-- Modified -->
+
+                <t t-set='title_only'
+                    t-value="page.question_ids.filtered(lambda p: p.question_type == 'title')">
+                </t>
+
+                <t t-set='questions'
+                    t-value="page.question_ids.filtered(lambda p: p.question_type != 'title')">
+
+                </t>
+
+                <div class="row">
+
+                    <t t-if="len(title_only) > 0">
+                        <div class="col-lg-6 col-md-12 scroll_page">
+                            <t t-foreach='title_only' t-as='question'>
+                                <div>
+                                    <t t-esc="question.title" />
+                                </div>
+                            </t>
+                        </div>
+
+                        <div class="col-lg-6 col-md-12 scroll_page scroll_question">
+                            <t t-foreach='questions' t-as='question'>
+                                <t t-if="question in answer.predefined_question_ids"
+                                    t-call="survey.question_container" />
+                            </t>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <t t-foreach='questions' t-as='question'>
+                            <t t-if="question in answer.predefined_question_ids"
+                                t-call="survey.question_container" />
+                        </t>
+                    </t>
+                </div>
+
+                <!-- Modified -->
+
+
+                <div class="row">
+                    <div class="col-12 text-center mt16">
+                        <button type="submit" t-att-value="'next' if not survey_last else 'finish'"
+                            class="btn btn-primary disabled">
+                            <t t-if="not survey_last">Continue</t>
+                            <t t-else="">Submit</t>
+                        </button>
+                        <span class="fw-bold text-muted ms-2 d-none d-md-inline" id="enter-tooltip">
+                            or press Enter</span>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+</odoo>
